@@ -1,0 +1,26 @@
+# Build artifacts
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.vcxproj
+*.sln
+*.slnx
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.lib
+
+# Generated render output
+image.ppm
+
+# Accidental local command/output placeholders
+/cmake
+/magick
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+
