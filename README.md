@@ -4,6 +4,21 @@ A C++ ray tracer built while working through _Ray Tracing in One Weekend_. This 
 
 ![Current render](image.png)
 
+## Implemented Features
+
+- [x] Vector math (`vec3`)
+- [x] Rays and camera ray generation
+- [x] Sphere intersections
+- [x] Hittable object abstraction
+- [x] Multiple objects through a hittable list
+- [x] Surface normal visualization
+- [x] Antialiasing through multisampling
+- [x] PPM output and PNG conversion workflow
+- [ ] Diffuse/material expansion
+- [ ] Dielectrics/glass
+- [ ] Depth of field
+- [ ] More complex scenes
+
 ## Highlights
 
 - Implements a small ray tracing renderer in C++.
@@ -53,7 +68,15 @@ magick image.ppm image.png
 - `rtweekend.h`: Shared constants, includes, and random helpers.
 - `notes.md`: Learning notes and implementation log.
 
+## What It Demonstrates
+
+| Area | Evidence in this project |
+|---|---|
+| C++ fundamentals | Builds math, ray, camera, and scene abstractions directly. |
+| Graphics math | Uses ray-sphere intersections, normals, sampling, and color output. |
+| Build tooling | Uses CMake and a repeatable render-to-image workflow. |
+| Learning process | `notes.md` documents implementation decisions and debugging lessons. |
+
 ## Status
 
 Work in progress. The renderer currently covers the early foundations of ray tracing and is ready for the next steps: diffuse materials, reflections, camera depth of field, more complex scenes, and cleaner material abstractions.
-
