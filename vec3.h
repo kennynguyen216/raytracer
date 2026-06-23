@@ -163,7 +163,24 @@ inline vec3 random_vec3(double min, double max) {
 }
 
 inline vec3 random_unit_vector(){
+    
+    while(true) {
+        vec3 random_point = random_vec3(-1,1);
+        double point_squared = random_point.length_squared();
+        if((point_squared <=1) && (point_squared > .01)) {
+            return random_point / random_point.length();
+        }
+    }
+}
 
-        
+inline vec3 random_on_hemisphere(const vec3& normal) {
+
+    vec3 random_vector = random_unit_vector();
+    if (dot(random_vector, normal) > 0) {
+        return random_vector;
+    }
+    else {
+        return random_vector.operator-();
+    }
 
 }
