@@ -196,3 +196,8 @@ inline vec3 reflect(const vec3& incoming, const vec3& normal) {
 
 
 }
+
+inline vec3 refract(const vec3& incoming, const vec3& normal, double etai_over_etat) {
+
+
+}
