@@ -1,8 +1,10 @@
 # Ray Tracer
 
-A C++ ray tracer built while working through _Ray Tracing in One Weekend_. This project is a learning-focused renderer that builds the graphics pipeline from first principles: vectors, rays, hittable objects, sphere intersections, camera setup, surface normals, and antialiasing.
+A C++ ray tracer built while working through _Ray Tracing in One Weekend_. This project is a learning-focused renderer that builds the graphics pipeline from first principles: vectors, rays, hittable objects, sphere intersections, camera setup, antialiasing, recursive ray scattering, diffuse materials, and reflective metal surfaces.
 
-![Current render](image.png)
+![Current render](renders/metal_spheres_scene.png)
+
+_Current render: reflective metal spheres, diffuse ground material, antialiasing, recursive bounces, and a custom lavender/blue scene palette._
 
 ## Implemented Features
 
@@ -13,8 +15,12 @@ A C++ ray tracer built while working through _Ray Tracing in One Weekend_. This 
 - [x] Multiple objects through a hittable list
 - [x] Surface normal visualization
 - [x] Antialiasing through multisampling
+- [x] Recursive ray scattering with configurable max bounce depth
+- [x] Lambertian diffuse material
+- [x] Reflective metal material
+- [x] Configurable metal fuzz for sharper or softer reflections
+- [x] Shadow-acne avoidance using a small ray-hit epsilon
 - [x] PPM output and PNG conversion workflow
-- [ ] Diffuse/material expansion
 - [ ] Dielectrics/glass
 - [ ] Depth of field
 - [ ] More complex scenes
@@ -23,6 +29,8 @@ A C++ ray tracer built while working through _Ray Tracing in One Weekend_. This 
 
 - Implements a small ray tracing renderer in C++.
 - Builds core rendering primitives from scratch: `vec3`, `ray`, `sphere`, `hittable`, `hittable_list`, `interval`, `color`, and `camera`.
+- Adds a material abstraction with `lambertian` and `metal` surface scattering.
+- Uses recursive rays to model light bounces, reflections, attenuation, and object-to-object reflections.
 - Renders to PPM and converts the output to PNG for viewing.
 - Adds antialiasing with multiple jittered samples per pixel.
 - Includes a learning log in `notes.md` explaining the rendering math and implementation decisions.
@@ -63,20 +71,23 @@ magick image.ppm image.png
 - `sphere.h`: Sphere hit logic.
 - `hittable.h`: Shared hit-record and hittable-object interface.
 - `hittable_list.h`: Scene container for hittable objects.
+- `material.h`: Lambertian diffuse and reflective metal material scattering.
 - `color.h`: Pixel color output.
 - `interval.h`: Numeric intervals and clamping.
 - `rtweekend.h`: Shared constants, includes, and random helpers.
 - `notes.md`: Learning notes and implementation log.
+- `renders/metal_spheres_scene.png`: Current portfolio render.
 
 ## What It Demonstrates
 
 | Area | Evidence in this project |
 |---|---|
 | C++ fundamentals | Builds math, ray, camera, and scene abstractions directly. |
-| Graphics math | Uses ray-sphere intersections, normals, sampling, and color output. |
+| Graphics math | Uses ray-sphere intersections, normals, recursive scattering, sampling, and color output. |
+| Rendering materials | Implements diffuse and metal materials with attenuation, reflection, and fuzz. |
 | Build tooling | Uses CMake and a repeatable render-to-image workflow. |
 | Learning process | `notes.md` documents implementation decisions and debugging lessons. |
 
 ## Status
 
-Work in progress. The renderer currently covers the early foundations of ray tracing and is ready for the next steps: diffuse materials, reflections, camera depth of field, more complex scenes, and cleaner material abstractions.
+Work in progress. The renderer currently supports antialiasing, diffuse surfaces, reflective metal materials, configurable fuzz, recursive bounce depth, and a multi-sphere scene. Next steps are dielectrics/glass, depth of field, camera positioning, and more complex scene composition.
