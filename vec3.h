@@ -85,6 +85,11 @@ class vec3 {
 
             return std::sqrt(length_squared());
         }
+
+        bool near_zero() const {
+            auto s = 1e-8;
+            return (std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) < s);
+        }
 };
 
 using point3 = vec3;
@@ -167,7 +172,7 @@ inline vec3 random_unit_vector(){
     while(true) {
         vec3 random_point = random_vec3(-1,1);
         double point_squared = random_point.length_squared();
-        if((point_squared <=1) && (point_squared > .01)) {
+        if((point_squared <=1) && (point_squared > 1e-160)) {
             return random_point / random_point.length();
         }
     }
@@ -182,5 +187,12 @@ inline vec3 random_on_hemisphere(const vec3& normal) {
     else {
         return random_vector.operator-();
     }
+
+}
+
+inline vec3 reflect(const vec3& incoming, const vec3& normal) {
+
+    return incoming - 2*dot(incoming, normal) * normal;
+
 
 }

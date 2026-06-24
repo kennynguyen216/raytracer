@@ -1,6 +1,7 @@
 #pragma once 
 #include "hittable.h"
 #include "vec3.h"
+#include "material.h"
 
 class camera {
     public:
@@ -57,18 +58,26 @@ class camera {
             {
                 return color(0,0,0);
             }
+
             vec3 lol = unit_vector(r.direction());
             auto blend = .5 * (lol.y() + 1.0);
-            auto white = color(1,1,1);
-            auto blue = color(.5,.7,1.0);
+            // auto white = color(1,1,1);
+            // auto blue = color(.5,.7,1.0);
+            // auto white = color(0.878, 0.851, 0.965); // lavender horizon glow (dimmer)
+            // auto blue = color(0.165, 0.137, 0.337); // midnight blue night sky (dimmer)
+            auto white = color(0.92, 0.9, 0.98); // lavender horizon glow, brighter
+            auto blue = color(0.28, 0.22, 0.48); // midnight blue night sky, brighter
 
             hit_record rec;
-            if (world.hit(r, interval(0, infinity), rec)) {
-                auto scatter_direction = random_on_hemisphere(rec.normal);
-                ray same_direction = ray(rec.p, scatter_direction);
-                return 0.5* ray_color(same_direction, world, depth-1);
-            } else {
-                return (1-blend) * white + blend * blue;
+            if (world.hit(r, interval(0.001, infinity), rec)) {
+                color attenuation;
+                ray scattered;
+                if(rec.mat->scatter(r, rec, attenuation, scattered)) {
+                    return attenuation * ray_color(scattered, world, depth-1);
+                }
+                return color(0,0,0);
+            } else { 
+                return (1-blend) * white + blend * blue; // sets the sky color 
             }
         }
         vec3 sample_square() const {

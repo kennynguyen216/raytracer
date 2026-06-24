@@ -3,6 +3,7 @@
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
+#include "material.h"
 /*
 //The following method is not needed anymore because of sphere.h
 //double hit_sphere(const point3& center, double radius, const ray& r) {
@@ -97,12 +98,33 @@
 */
 
 int main() {
+
     hittable_list world;
     camera cam; 
     cam.aspect_ratio = 16.0 / 9.0;
-    cam.image_width = 400;
+    cam.image_width = 800;
     cam.samples_per_pixel = 100;
-    world.add(make_shared<sphere>(point3(0,0,-1), .5));
-    world.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
+
+    // material/sphere construction cheat sheet moved to notes.md ("Quick Reference: Materials & Spheres")
+
+    // auto material_ground = make_shared<lambertian>(color(0.25, 0.15, .08));
+    // auto material_sphere = make_shared<metal>(color(0.9, 0.05, 0.15), 0.2);
+    // auto material_left = make_shared<metal>(color(0.0, 0.9, 1.0), 0.05); // neon cyan, sharp mirror
+    // auto material_right = make_shared<lambertian>(color(0.02, 0.02, 0.03)); // near-black matte
+    // auto material_sphere = make_shared<metal>(color(0.761, 0.322, 0.882), 0.0); // medium orchid (dimmer)
+    // auto material_left = make_shared<metal>(color(0.431, 0.796, 0.961), 0.0); // light sky blue (dimmer)
+    // auto material_right = make_shared<metal>(color(0.345, 0.416, 0.886), 0.0); // royal blue (dimmer)
+    auto material_ground = make_shared<lambertian>(color(0.01, 0.01, 0.015)); // almost black
+    auto material_sphere = make_shared<metal>(color(0.88, 0.42, 0.98), 0.05); // medium orchid, brighter
+    auto material_left = make_shared<metal>(color(0.55, 0.88, 1.0), 0.15); // light sky blue, brighter
+    auto material_right = make_shared<metal>(color(0.45, 0.52, 0.98), 0.3); // royal blue, brighter
+    world.add(make_shared<sphere>(point3(0,0,-1), .5, material_sphere)); // main sphere
+    world.add(make_shared<sphere>(point3(0,-100.5,-1), 100, material_ground)); // ground sphere
+    world.add(make_shared<sphere>(point3(-1,0,-1), 0.5, material_left)); // left sphere
+    world.add(make_shared<sphere>(point3(1,0,-1), 0.5, material_right)); // right sphere
+
+    // add more spheres below, following the two patterns above:
+    // auto material_whatever = make_shared<lambertian>(color(...));        // or metal(color(...), fuzz)
+    // world.add(make_shared<sphere>(point3(x, y, z), radius, material_whatever));
     cam.render(world);
 }

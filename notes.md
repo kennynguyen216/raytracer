@@ -222,3 +222,55 @@ Fixing the jagged "stair-step" edges caused by **point sampling** — one ray th
 - [DONE] Restructure `render()`'s inner loop to accumulate + average `samples_per_pixel` rays per pixel
 - [DONE] Set `cam.samples_per_pixel = 100` in `main.cpp`
 - [DONE] Test compile and run — same scene, antialiased edges
+
+## Chapter 10: Metal
+
+### What this chapter is about
+Up until now, `ray_color()` hardcoded one fixed way for rays to bounce off anything they hit. This chapter abstracts "how does a ray scatter when it hits a surface" into a `material` class hierarchy — different objects can now behave completely differently, instead of everything acting the same way. Mirrors the `hittable`/`sphere` abstraction from chapter 6, but for *surface behavior* instead of *shape*.
+
+**`material` (material.h)** — abstract base class with one method, `scatter()`, that every concrete material implements. Takes the incoming ray and hit info, and produces two "outputs" via reference parameters — `attenuation` (color) and `scattered` (ray) — plus returns a `bool` (did scattering happen, or did the surface fully absorb the ray?).
+
+**`lambertian`** — the matte/diffuse material. Real matte surfaces scatter incoming light in many random directions. Uses **"True Lambertian Reflection"**: `rec.normal + random_unit_vector()` — biased toward the normal direction, matching how real diffuse materials behave (more likely to scatter outward than at a grazing angle). `near_zero()` guards against the random vector nearly canceling the normal out (would produce a zero-length direction, breaking the ray math). `attenuation` is set to the material's own color (`albedo`) — this is what gives objects their actual tint/color, replacing chapter 9's flat `0.5` multiplier.
+
+**`metal`** — the shiny/mirror material. Reflects predictably instead of randomly: `reflect(v, n) = v - 2*dot(v,n)*n` (the "angle in = angle out" mirror formula, in `vec3.h`). Has a `fuzz` parameter (`0` = perfect mirror, higher = blurrier/satin reflection) — adds a small random perturbation to the otherwise-exact reflection direction.
+
+**Ray origins through a bounce chain** — only the very first ray (from the camera, via `get_ray()`) starts at the camera. Every ray after a bounce starts at `rec.p` (the previous hit point) — `scattered = ray(rec.p, direction);` in both materials' `scatter()`. Light/rays effectively "walk" from hit point to hit point until they escape to the sky or hit `depth` 0.
+
+**New C++ concepts**:
+- **Forward declaration** (`class material;` in `hittable.h`) — breaks a circular include dependency (`hittable.h` and `material.h` each needed something from the other). A forward declaration is enough to declare a `shared_ptr<material>` *member*, but not enough to call its methods — that needs the full `#include`.
+- **Reference output parameters** (`color&`, `ray&`) — lets one function hand back multiple results to its caller, same trick as `hit_record& rec` in `hittable::hit()`.
+- **`override`** — makes the compiler verify a derived class's method actually matches a base class virtual function's signature.
+
+**Bug found and fixed**: `sphere::hit()` has two branches (near root / far root) where a hit can be recorded — both need `rec.mat = mat;`, not just one. Missing it in one branch left `rec.mat` as a null `shared_ptr`, causing undefined behavior when `rec.mat->scatter(...)` was called.
+
+**Shadow acne fix** (found by trial, matches the book): changed the hit-test valid range from `interval(0, infinity)` to `interval(0.001, infinity)` in `camera.h`. Scattered rays start exactly *on* a surface, and floating-point rounding can otherwise cause a ray to immediately re-hit the same point it just bounced from.
+
+### Checklist
+- [DONE] Add `reflect(v, n)` to `vec3.h`
+- [DONE] Add `near_zero()` to `vec3.h`
+- [DONE] Create `material.h` with abstract `material` base class (`scatter()` pure virtual)
+- [DONE] Add `lambertian` class — True Lambertian scattering + `near_zero()` fallback
+- [DONE] Add `metal` class — `reflect()` based scattering + `fuzz` parameter, clamped to `<1`
+- [DONE] Add forward declaration `class material;` and `shared_ptr<material> mat` to `hittable.h`'s `hit_record`
+- [DONE] Update `sphere.h` — constructor takes/stores a `shared_ptr<material>`, `hit()` sets `rec.mat` in both branches
+- [DONE] Update `camera.h`'s `ray_color()` to call `rec.mat->scatter(...)` instead of hardcoded diffuse logic
+- [DONE] Apply shadow-acne fix (`interval(0.001, infinity)`)
+- [DONE] Update `main.cpp` — create `lambertian`/`metal` material objects, pass as 3rd argument to `make_shared<sphere>(...)`
+- [DONE] Test compile and run — colored matte ground + reflective metal spheres, visible reflections between objects
+
+## Quick Reference: Materials & Spheres
+
+**Matte/diffuse**: `make_shared<lambertian>(color(r, g, b))`
+r,g,b each `0.0-1.0` — the surface's own tint. No shine, no reflections.
+
+**Shiny/mirror**: `make_shared<metal>(color(r, g, b), fuzz)`
+r,g,b same as above. `fuzz` `0.0-1.0` — `0` = sharp mirror, higher = blurrier/satin reflection.
+
+Give each material its own variable name so it can be reused on multiple spheres.
+
+**Sphere**: `world.add(make_shared<sphere>(point3(x, y, z), radius, material_variable));`
+- `x`: negative = left, positive = right
+- `y`: negative = down, positive = up (the ground sphere sits low, e.g. `y = -100.5`, `radius = 100`)
+- `z`: negative = into the screen, away from the camera (camera looks down `-z`; `z = -1` is a typical placement)
+- `radius`: world-space size of the sphere
+- keep spheres' centers + radii from overlapping, unless you want them intersecting
