@@ -199,5 +199,9 @@ inline vec3 reflect(const vec3& incoming, const vec3& normal) {
 
 inline vec3 refract(const vec3& incoming, const vec3& normal, double etai_over_etat) {
 
+    auto cos_theta = std::fmin(dot(-incoming, normal),1.0);
+    auto r_out_perp = etai_over_etat * (incoming + cos_theta * normal);
+    auto r_out_parallel = -std::sqrt(std::fabs(1.0 - r_out_perp.length_squared())) * normal;
+    return r_out_perp + r_out_parallel;
 
 }
