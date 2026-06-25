@@ -258,6 +258,37 @@ Up until now, `ray_color()` hardcoded one fixed way for rays to bounce off anyth
 - [DONE] Update `main.cpp` — create `lambertian`/`metal` material objects, pass as 3rd argument to `make_shared<sphere>(...)`
 - [DONE] Test compile and run — colored matte ground + reflective metal spheres, visible reflections between objects
 
+## Chapter 12: Positionable Camera
+
+### What this chapter is about
+This chapter makes the camera movable. Before this, the camera was hardcoded at `(0,0,0)` looking down the negative z axis. Now the camera can be placed anywhere and aimed at any point in the scene.
+
+**`lookfrom`** — where the camera is sitting. Moving this changes the camera position.
+- Larger `x` moves the camera to the right; smaller/negative `x` moves it left.
+- Larger `y` moves the camera upward; smaller/negative `y` moves it downward.
+- Larger `z` moves the camera closer to the viewer/front; more negative `z` moves it deeper into the scene.
+
+**`lookat`** — the point the camera aims at. This is usually the object or area you want centered in the image. Changing `lookat` rotates the camera toward a different target without necessarily moving the camera.
+
+**`vup`** — the camera's idea of "up". Usually this stays `vec3(0,1,0)`, meaning world +y is up. If this changes, the camera can roll or tilt, like rotating a phone while still pointing it at the same subject.
+
+**`vfov`** — vertical field of view, in degrees. This controls how wide or zoomed the camera feels.
+- Smaller values like `20` or `30` feel zoomed in.
+- Larger values like `90` feel wide-angle, with more peripheral vision and more distortion.
+
+**Camera basis vectors** — `u`, `v`, and `w` are the camera's local axes.
+- `w = unit_vector(lookfrom - lookat)` points backward from the target toward the camera.
+- `u = unit_vector(cross(vup, w))` points camera-right.
+- `v = cross(w, u)` points camera-up.
+
+These replace the old hardcoded world-axis viewport. Instead of always using world x for horizontal and world y for vertical, the viewport now uses the camera's own right/up/back directions. This is what lets the camera move and rotate while still generating rays correctly.
+
+**Quick camera examples**
+- Familiar old view: `lookfrom = point3(0,0,0)`, `lookat = point3(0,0,-1)`, `vup = vec3(0,1,0)`, `vfov = 90`.
+- Cinematic side view: move `lookfrom` sideways/up, but keep `lookat` aimed at the main sphere.
+- Zoomed view: lower `vfov`.
+- Wide view: raise `vfov`.
+
 ## Quick Reference: Materials & Spheres
 
 **Matte/diffuse**: `make_shared<lambertian>(color(r, g, b))`

@@ -101,8 +101,12 @@ int main() {
 
     hittable_list world;
     camera cam; 
+    cam.vfov = 45;
+    cam.lookfrom = point3(-2,2,1);
+    cam.lookat = point3(0,0,-1);
+    cam.vup = vec3(0,1,0);
     cam.aspect_ratio = 16.0 / 9.0;
-    cam.image_width = 800;
+    cam.image_width = 400;
     cam.samples_per_pixel = 100;
 
     // material/sphere construction cheat sheet moved to notes.md ("Quick Reference: Materials & Spheres")
@@ -116,7 +120,7 @@ int main() {
     // auto material_right = make_shared<metal>(color(0.345, 0.416, 0.886), 0.0); // royal blue (dimmer)
     auto material_ground = make_shared<lambertian>(color(0.01, 0.01, 0.015)); // almost black
     auto material_sphere = make_shared<metal>(color(0.88, 0.42, 0.98), 0.05); // medium orchid, brighter
-    auto material_left = make_shared<dielectric>(1.5); // light sky blue, brighter
+    auto material_left = make_shared<dielectric>(1.5); // glassssss
     auto material_right = make_shared<metal>(color(0.45, 0.52, 0.98), 0.3); // royal blue, brighter
     world.add(make_shared<sphere>(point3(0,0,-1), .5, material_sphere)); // main sphere
     world.add(make_shared<sphere>(point3(0,-100.5,-1), 100, material_ground)); // ground sphere
