@@ -49,7 +49,7 @@ class camera {
             center = lookfrom;
             image_height = int(image_width / aspect_ratio);
             image_height = std::max(1, image_height);
-            auto focal_length = 1.0;
+            auto focal_length = (lookfrom - lookat).length();
             auto theta = degrees_to_radians(vfov);
             auto h = std::tan(theta/2);
             auto viewport_height = 2 * h * focal_length;
