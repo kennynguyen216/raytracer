@@ -1,10 +1,14 @@
 # Ray Tracer
 
-A C++ ray tracer built while working through _Ray Tracing in One Weekend_. This project is a learning-focused renderer that builds the graphics pipeline from first principles: vectors, rays, hittable objects, sphere intersections, camera setup, antialiasing, recursive ray scattering, diffuse materials, reflective metal surfaces, dielectric glass, refraction, and a positionable camera.
+A C++ ray tracer built while working through _Ray Tracing in One Weekend_. This project is a learning-focused renderer that builds the graphics pipeline from first principles: vectors, rays, hittable objects, sphere intersections, camera setup, antialiasing, recursive ray scattering, diffuse materials, reflective metal surfaces, dielectric glass, refraction, a positionable camera, and depth-of-field style defocus blur.
 
 ![Current render](renders/glass_hollow_sphere_scene.png)
 
 _Current render: a glass hollow sphere, reflective metal spheres, diffuse ground material, antialiasing, recursive bounces, refraction, and a positionable camera view._
+
+## Final Render
+
+Final render coming soon. This section is reserved for the polished scene render after the last camera/material pass.
 
 ## Implemented Features
 
@@ -24,9 +28,9 @@ _Current render: a glass hollow sphere, reflective metal spheres, diffuse ground
 - [x] Schlick-style reflectance approximation
 - [x] Hollow glass sphere setup using nested dielectric spheres
 - [x] Positionable camera with `lookfrom`, `lookat`, `vup`, and vertical field of view
+- [x] Defocus blur / depth of field using aperture angle, focus distance, and random lens-disk sampling
 - [x] Shadow-acne avoidance using a small ray-hit epsilon
 - [x] PPM output and PNG conversion workflow
-- [ ] Depth of field
 - [ ] More complex scenes
 
 ## Highlights
@@ -35,7 +39,7 @@ _Current render: a glass hollow sphere, reflective metal spheres, diffuse ground
 - Builds core rendering primitives from scratch: `vec3`, `ray`, `sphere`, `hittable`, `hittable_list`, `interval`, `color`, and `camera`.
 - Adds a material abstraction with `lambertian`, `metal`, and `dielectric` surface scattering.
 - Uses recursive rays to model light bounces, reflections, refraction, attenuation, and object-to-object reflections.
-- Implements a movable camera so scenes can be framed from different positions and fields of view.
+- Implements a movable camera with field-of-view controls, focus distance, and defocus blur.
 - Renders to PPM and converts the output to PNG for viewing.
 - Adds antialiasing with multiple jittered samples per pixel.
 - Includes a learning log in `notes.md` explaining the rendering math and implementation decisions.
@@ -70,7 +74,7 @@ magick image.ppm image.png
 ## Project Structure
 
 - `main.cpp`: Builds the scene and starts rendering.
-- `camera.h`: Positionable camera setup, render loop, ray generation, and pixel sampling.
+- `camera.h`: Positionable camera setup, render loop, ray generation, pixel sampling, and defocus blur.
 - `vec3.h`: 3D vector math.
 - `ray.h`: Ray origin/direction model.
 - `sphere.h`: Sphere hit logic.
@@ -90,10 +94,10 @@ magick image.ppm image.png
 | C++ fundamentals | Builds math, ray, camera, and scene abstractions directly. |
 | Graphics math | Uses ray-sphere intersections, normals, recursive scattering, sampling, refraction, and color output. |
 | Rendering materials | Implements diffuse, metal, and dielectric materials with attenuation, reflection, refraction, and fuzz. |
-| Camera systems | Supports configurable camera position, target, up vector, and vertical field of view. |
+| Camera systems | Supports configurable camera position, target, up vector, vertical field of view, focus distance, and defocus angle. |
 | Build tooling | Uses CMake and a repeatable render-to-image workflow. |
 | Learning process | `notes.md` documents implementation decisions and debugging lessons. |
 
 ## Status
 
-Work in progress. The renderer currently supports antialiasing, diffuse surfaces, reflective metal materials, dielectric glass, refraction, Schlick reflectance, hollow glass spheres, recursive bounce depth, and a positionable camera. Next steps are depth of field, camera defocus blur, and more complex scene composition.
+Work in progress. The renderer currently supports antialiasing, diffuse surfaces, reflective metal materials, dielectric glass, refraction, Schlick reflectance, hollow glass spheres, recursive bounce depth, a positionable camera, and defocus blur. The next step is composing and rendering the final polished scene.
