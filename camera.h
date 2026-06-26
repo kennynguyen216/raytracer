@@ -13,6 +13,8 @@ class camera {
         point3 lookfrom = point3(0,0,0);
         point3 lookat = point3(0,0,-1);
         vec3 vup = vec3(0,1,0);
+        double defocus_angle = 0;
+        double focus_dist = 10;
         
         void render(const hittable& world) {
             initialize();
@@ -44,8 +46,17 @@ class camera {
         vec3 v; 
         vec3 w;
         double pixel_samples_scale;
+        vec3 defocus_disk_u;
+        vec3 defocus_disk_v;
+
+        vec3 defocus_disk_sample() const {
+            auto p = random_in_unit_disk();
+            return center + p.x() * defocus_disk_u + p.y() * defocus_disk_v;
+        }
+
 // this initializes all the stuff in main.cpp just cleaning up code 
         void initialize() {
+            // u = camera right v = camera up and w = camera backward
             center = lookfrom;
             image_height = int(image_width / aspect_ratio);
             image_height = std::max(1, image_height);
@@ -57,6 +68,9 @@ class camera {
             w = unit_vector(lookfrom - lookat);
             u = unit_vector(cross(vup, w));
             v = cross(w,u);
+            auto defocus_radius = focus_dist * std::tan(degrees_to_radians(defocus_angle/2));
+            defocus_disk_u = u * defocus_radius;
+            defocus_disk_v = v * defocus_radius;
             auto viewport_u = viewport_width * u;
             auto viewport_v = viewport_height * -v;
             pixel_delta_u = viewport_u / image_width;
@@ -64,6 +78,7 @@ class camera {
             auto viewport_upper_left  = center - (viewport_u * .5) - (viewport_v * .5) - (focal_length * w);
             pixel00_loc = viewport_upper_left + (pixel_delta_v*.5) + (pixel_delta_u*.5);
             pixel_samples_scale = 1.0 / samples_per_pixel;
+        
         }
         color ray_color(const ray& r, const hittable& world, int depth) const {
             if (depth <= 0)
@@ -99,10 +114,16 @@ class camera {
             return vec3(x,y,z);
         }
         ray get_ray(int i, int j) const {
+            vec3 ray_origin;
+            if(defocus_angle <= 0){
+                ray_origin = center;
+            } else{
+                ray_origin = defocus_disk_sample();
+            }
             auto offset = sample_square();
             auto pixel_sample = pixel00_loc + ((i + offset.x()) * pixel_delta_u) + ((j + offset.y()) * pixel_delta_v);
-            auto ray_direction = pixel_sample - center;
-            ray r  = ray(center, ray_direction);
+            auto ray_direction = pixel_sample - ray_origin;
+            ray r  = ray(ray_origin, ray_direction);
             return r;
         }
 };

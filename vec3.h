@@ -205,3 +205,15 @@ inline vec3 refract(const vec3& incoming, const vec3& normal, double etai_over_e
     return r_out_perp + r_out_parallel;
 
 }
+
+inline vec3 random_in_unit_disk(){
+    double z = 0;
+    while(true) {
+        auto x = random_double(-1.0,1.0);
+        auto y = random_double(-1.0,1.0);
+        vec3 random_p = vec3(x,y,z);
+        if (random_p.length_squared() < 1){
+            return random_p;
+        }
+    }
+}

@@ -101,13 +101,15 @@ int main() {
 
     hittable_list world;
     camera cam; 
-    cam.vfov = 45;
-    cam.lookfrom = point3(-2,2,1);
+    cam.vfov = 90;
+    cam.lookfrom = point3(0,0,0);
     cam.lookat = point3(0,0,-1);
     cam.vup = vec3(0,1,0);
     cam.aspect_ratio = 16.0 / 9.0;
     cam.image_width = 400;
     cam.samples_per_pixel = 100;
+    cam.defocus_angle = 2.0;
+    cam.focus_dist = 1.0;
 
     // material/sphere construction cheat sheet moved to notes.md ("Quick Reference: Materials & Spheres")
 
