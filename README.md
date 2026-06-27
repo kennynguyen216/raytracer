@@ -2,13 +2,15 @@
 
 A C++ ray tracer built while working through _Ray Tracing in One Weekend_. This project is a learning-focused renderer that builds the graphics pipeline from first principles: vectors, rays, hittable objects, sphere intersections, camera setup, antialiasing, recursive ray scattering, diffuse materials, reflective metal surfaces, dielectric glass, refraction, a positionable camera, and depth-of-field style defocus blur.
 
-![Current render](renders/glass_hollow_sphere_scene.png)
+![Final render](renders/final_render.png)
 
-_Current render: a glass hollow sphere, reflective metal spheres, diffuse ground material, antialiasing, recursive bounces, refraction, and a positionable camera view._
+_Final render: a randomized multi-sphere scene with glass, hollow dielectric bubbles, reflective metal materials, defocus blur, recursive bounces, and a custom purple/blue scene palette._
 
 ## Final Render
 
-Final render coming soon. This section is reserved for the polished scene render after the last camera/material pass.
+![Final render](renders/final_render.png)
+
+The final scene uses a large procedural sphere field around three hero objects: a hollow glass sphere, a reflective purple metal sphere, and a blue metal sphere. It renders at 800px width with 500 samples per pixel, recursive scattering, dielectric refraction, reflective materials, and camera defocus blur.
 
 ## Implemented Features
 
@@ -29,9 +31,10 @@ Final render coming soon. This section is reserved for the polished scene render
 - [x] Hollow glass sphere setup using nested dielectric spheres
 - [x] Positionable camera with `lookfrom`, `lookat`, `vup`, and vertical field of view
 - [x] Defocus blur / depth of field using aperture angle, focus distance, and random lens-disk sampling
+- [x] Randomized final scene generation with diffuse, metal, and dielectric spheres
+- [x] Higher-sample final render pass
 - [x] Shadow-acne avoidance using a small ray-hit epsilon
 - [x] PPM output and PNG conversion workflow
-- [ ] More complex scenes
 
 ## Highlights
 
@@ -40,6 +43,7 @@ Final render coming soon. This section is reserved for the polished scene render
 - Adds a material abstraction with `lambertian`, `metal`, and `dielectric` surface scattering.
 - Uses recursive rays to model light bounces, reflections, refraction, attenuation, and object-to-object reflections.
 - Implements a movable camera with field-of-view controls, focus distance, and defocus blur.
+- Builds a randomized final scene with many small spheres and three larger hero materials.
 - Renders to PPM and converts the output to PNG for viewing.
 - Adds antialiasing with multiple jittered samples per pixel.
 - Includes a learning log in `notes.md` explaining the rendering math and implementation decisions.
@@ -85,7 +89,8 @@ magick image.ppm image.png
 - `interval.h`: Numeric intervals and clamping.
 - `rtweekend.h`: Shared constants, includes, and random helpers.
 - `notes.md`: Learning notes and implementation log.
-- `renders/glass_hollow_sphere_scene.png`: Current portfolio render.
+- `renders/final_render.png`: Final portfolio render.
+- `renders/glass_hollow_sphere_scene.png`: Earlier glass/refraction milestone render.
 
 ## What It Demonstrates
 
@@ -95,9 +100,10 @@ magick image.ppm image.png
 | Graphics math | Uses ray-sphere intersections, normals, recursive scattering, sampling, refraction, and color output. |
 | Rendering materials | Implements diffuse, metal, and dielectric materials with attenuation, reflection, refraction, and fuzz. |
 | Camera systems | Supports configurable camera position, target, up vector, vertical field of view, focus distance, and defocus angle. |
+| Scene composition | Builds a randomized many-object scene with glass, metal, diffuse, and hollow dielectric objects. |
 | Build tooling | Uses CMake and a repeatable render-to-image workflow. |
 | Learning process | `notes.md` documents implementation decisions and debugging lessons. |
 
 ## Status
 
-Work in progress. The renderer currently supports antialiasing, diffuse surfaces, reflective metal materials, dielectric glass, refraction, Schlick reflectance, hollow glass spheres, recursive bounce depth, a positionable camera, and defocus blur. The next step is composing and rendering the final polished scene.
+Completed _Ray Tracing in One Weekend_ milestone render. The renderer supports antialiasing, diffuse surfaces, reflective metal materials, dielectric glass, refraction, Schlick reflectance, hollow glass spheres, recursive bounce depth, a positionable camera, defocus blur, and randomized scene generation. Future work could include BVH acceleration, texture mapping, motion blur, and more complex geometry.

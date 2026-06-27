@@ -101,15 +101,15 @@ int main() {
 
     hittable_list world;
     camera cam; 
-    cam.vfov = 90;
-    cam.lookfrom = point3(0,0,0);
-    cam.lookat = point3(0,0,-1);
+    cam.vfov = 25;
+    cam.lookfrom = point3(7,3,5);
+    cam.lookat = point3(0,0.5,0);
     cam.vup = vec3(0,1,0);
     cam.aspect_ratio = 16.0 / 9.0;
-    cam.image_width = 400;
-    cam.samples_per_pixel = 100;
-    cam.defocus_angle = 2.0;
-    cam.focus_dist = 1.0;
+    cam.image_width = 800;
+    cam.samples_per_pixel = 500;
+    cam.defocus_angle = 0.6;
+    cam.focus_dist = (cam.lookfrom - cam.lookat).length();
 
     // material/sphere construction cheat sheet moved to notes.md ("Quick Reference: Materials & Spheres")
 
@@ -120,19 +120,73 @@ int main() {
     // auto material_sphere = make_shared<metal>(color(0.761, 0.322, 0.882), 0.0); // medium orchid (dimmer)
     // auto material_left = make_shared<metal>(color(0.431, 0.796, 0.961), 0.0); // light sky blue (dimmer)
     // auto material_right = make_shared<metal>(color(0.345, 0.416, 0.886), 0.0); // royal blue (dimmer)
-    auto material_ground = make_shared<lambertian>(color(0.01, 0.01, 0.015)); // almost black
-    auto material_sphere = make_shared<metal>(color(0.88, 0.42, 0.98), 0.05); // medium orchid, brighter
-    auto material_left = make_shared<dielectric>(1.5); // glassssss
-    auto material_bubble = make_shared<dielectric>(1.0 / 1.5); // hollow air bubble inside the glass
-    auto material_right = make_shared<metal>(color(0.45, 0.52, 0.98), 0.3); // royal blue, brighter
-    world.add(make_shared<sphere>(point3(0,0,-1), .5, material_sphere)); // main sphere
-    world.add(make_shared<sphere>(point3(0,-100.5,-1), 100, material_ground)); // ground sphere
-    world.add(make_shared<sphere>(point3(-1,0,-1), 0.5, material_left)); // left sphere
-    world.add(make_shared<sphere>(point3(-1,0,-1), 0.4, material_bubble)); // hollow bubble
-    world.add(make_shared<sphere>(point3(1,0,-1), 0.5, material_right)); // right sphere
+    /*
+    Previous hand-built cyberpunk test scene:
 
-    // add more spheres below, following the two patterns above:
-    // auto material_whatever = make_shared<lambertian>(color(...));        // or metal(color(...), fuzz)
-    // world.add(make_shared<sphere>(point3(x, y, z), radius, material_whatever));
+    auto material_ground = make_shared<lambertian>(color(0.01, 0.01, 0.015));
+    auto material_sphere = make_shared<metal>(color(0.88, 0.42, 0.98), 0.05);
+    auto material_left = make_shared<dielectric>(1.5);
+    auto material_bubble = make_shared<dielectric>(1.0 / 1.5);
+    auto material_right = make_shared<metal>(color(0.45, 0.52, 0.98), 0.3);
+    world.add(make_shared<sphere>(point3(0,0,-1), .5, material_sphere));
+    world.add(make_shared<sphere>(point3(0,-100.5,-1), 100, material_ground));
+    world.add(make_shared<sphere>(point3(-1,0,-1), 0.5, material_left));
+    world.add(make_shared<sphere>(point3(-1,0,-1), 0.4, material_bubble));
+    world.add(make_shared<sphere>(point3(1,0,-1), 0.5, material_right));
+    */
+
+    auto ground_material = make_shared<lambertian>(color(0.008, 0.008, 0.012));
+    world.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
+
+    for (int a = -8; a < 8; a++) {
+        for (int b = -8; b < 8; b++) {
+            auto choose_mat = random_double();
+            point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
+
+            if ((center - point3(0, 0.2, 0)).length() > 1.1 &&
+                (center - point3(4, 0.2, 0)).length() > 1.1 &&
+                (center - point3(-4, 0.2, 0)).length() > 1.1) {
+                shared_ptr<material> sphere_material;
+
+                if (choose_mat < 0.60) {
+                    auto albedo = color(
+                        random_double(0.01, 0.08),
+                        random_double(0.005, 0.04),
+                        random_double(0.03, 0.16)
+                    );
+                    sphere_material = make_shared<lambertian>(albedo);
+                } else if (choose_mat < 0.90) {
+                    color albedo;
+                    auto neon_pick = random_double();
+                    if (neon_pick < 0.25) {
+                        albedo = color(0.55, 0.95, 1.0);
+                    } else if (neon_pick < 0.50) {
+                        albedo = color(0.95, 0.35, 1.0);
+                    } else if (neon_pick < 0.75) {
+                        albedo = color(0.35, 0.45, 1.0);
+                    } else {
+                        albedo = color(0.75, 0.55, 0.95);
+                    }
+                    auto fuzz = random_double(0.0, 0.35);
+                    sphere_material = make_shared<metal>(albedo, fuzz);
+                } else {
+                    sphere_material = make_shared<dielectric>(1.5);
+                }
+
+                world.add(make_shared<sphere>(center, 0.2, sphere_material));
+            }
+        }
+    }
+
+    auto material_left = make_shared<dielectric>(1.5);
+    auto material_bubble = make_shared<dielectric>(1.0 / 1.5);
+    auto material_center = make_shared<metal>(color(0.88, 0.42, 0.98), 0.04);
+    auto material_right = make_shared<metal>(color(0.45, 0.88, 1.0), 0.18);
+
+    world.add(make_shared<sphere>(point3(-4,1,0), 1.0, material_left));
+    world.add(make_shared<sphere>(point3(-4,1,0), 0.85, material_bubble));
+    world.add(make_shared<sphere>(point3(0,1,0), 1.0, material_center));
+    world.add(make_shared<sphere>(point3(4,1,0), 1.0, material_right));
+
     cam.render(world);
 }
